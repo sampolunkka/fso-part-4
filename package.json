@@ -1,10 +1,10 @@
 {
   "name": "part3-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
     "build:ui": "cd web && npm run build",
     "lint": "eslint ."
   },
