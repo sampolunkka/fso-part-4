@@ -1,3 +1,5 @@
+const logger = require('./logger')
+
 /** @type {import('express').ErrorRequestHandler} */
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
@@ -15,10 +17,12 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
 }
 
-const morgan = require('morgan')
-morgan.token('body', (request) => {
-    return JSON.stringify(request.body)
-})
-const requestLogger = morgan(':method :url :status :res[content-length] - :response-time ms :body')
+const requestLogger = (request, response, next) => {
+    logger.info('Method:', request.method)
+    logger.info('Path:  ', request.path)
+    logger.info('Body:  ', request.body)
+    logger.info('---')
+    next()
+}
 
 module.exports = {errorHandler, unknownEndpoint, requestLogger}
