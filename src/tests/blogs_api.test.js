@@ -4,22 +4,10 @@ const supertest = require('supertest')
 const assert = require('assert')
 const app = require('../app')
 const api = supertest(app)
-const Blog = require('../model/blog')
+const Blog = require('../models/blog')
+const helper = require('./testutils/test_helper')
 
-const initialBlogs = [
-    {
-        title: 'Blog 1',
-        author: 'Author 1',
-        likes: 1,
-        url: 'url',
-    },
-    {
-        title: 'Blog 2',
-        content: 'Author 2',
-        likes: 2,
-        url: 'url',
-    },
-]
+const initialBlogs = helper.initialBlogs
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -34,12 +22,40 @@ test('when get blogs then all blogs are returned', async () => {
     assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
-test('when get blog by id then the correct blog is returned', async () => {
-    const blogsAtStart = await Blog.find({})
-    const blogToView = blogsAtStart[0]
+test('when post blogs then success', async () => {
+    const newBlog = {
+        title: 'Blog 3',
+        author: 'Author 3',
+        url: 'url',
+    }
 
-    const response = await api.get(`/api/blogs/${blogToView.id}`)
-    assert.strictEqual(response.body.title, blogToView.title)
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+
+    assert.strictEqual(response.body.title, newBlog.title)
+    assert.strictEqual(response.body.author, newBlog.author)
+    assert.strictEqual(response.body.url, newBlog.url)
+    assert.ok(response.body.id)
+
+    const notesAtEnd = await helper.notesInDb()
+    assert.strictEqual(notesAtEnd.length, initialBlogs.length + 1)
+})
+
+test('given no title when post blogs then error', async () => {
+    const newBlog = {
+        author: 'Author 3',
+        url: 'url',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const notesAtEnd = await helper.notesInDb()
+    assert.strictEqual(notesAtEnd.length, initialBlogs.length)
 })
 
 after(async () => {
