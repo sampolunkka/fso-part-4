@@ -115,8 +115,8 @@ test('given undefined url when post blogs then bad request', async () => {
 })
 
 test('given valid id when delete blog then success', async () => {
-    const initialBlogsInDb = await helper.notesInDb()
-    const id = initialBlogsInDb[0].id
+    const blogs = await helper.notesInDb()
+    const id = blogs[0].id
 
     await api
         .delete(`/api/blogs/${id}`)
@@ -133,6 +133,40 @@ test('given invalid id when delete blog then not found', async () => {
     await api
         .delete(`/api/blogs/${invalidId}`)
         .expect(404)
+})
+
+test('given valid id when patch blog then success', async () => {
+    const blogs = await helper.notesInDb()
+    const id = blogs[0].id
+    const likes = blogs[0].likes + 1
+
+    const response = await api
+        .patch(`/api/blogs/${id}`)
+        .send({likes})
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, likes)
+})
+
+test('given invalid id when patch blog then not found', async () => {
+    const invalidId = await helper.nonExistingId()
+
+    await api
+        .patch(`/api/blogs/${invalidId}`)
+        .send({likes: 10})
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
+})
+
+test('given undefined likes when patch blog then bad request', async () => {
+    const blogs = await helper.notesInDb()
+    const id = blogs[0].id
+
+    await api
+        .patch(`/api/blogs/${id}`)
+        .send({})
+        .expect(400)
 })
 
 after(async () => {
