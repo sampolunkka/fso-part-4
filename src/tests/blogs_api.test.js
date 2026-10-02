@@ -123,7 +123,7 @@ test('given valid id when delete blog then success', async () => {
         .expect(204)
 
     const resultingBlogs = await helper.notesInDb()
-    assert.ok(resultingBlogs.length === initialBlogsInDb.length - 1)
+    assert.ok(resultingBlogs.length === blogs.length - 1)
     assert.ok(!resultingBlogs.find(blog => blog.id === id))
 })
 
