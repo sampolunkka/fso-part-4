@@ -17,13 +17,23 @@ beforeEach(async () => {
     await BlogObject.save()
 })
 
-test('when get blogs then all blogs are returned', async () => {
-    const response = await api.get('/api/blogs')
+test('when get blogs then success', async () => {
+    const response = await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
     assert.strictEqual(response.body.length, initialBlogs.length)
+
+    response.body.forEach((blog) => {
+        assert.ok(blog.id)
+        assert.ok(blog.id !== undefined && blog.id !== null)
+
+    })
 })
 
 test('when post blogs then success', async () => {
-    const newBlog = {
+    const request = {
         title: 'Blog 3',
         author: 'Author 3',
         url: 'url',
@@ -31,31 +41,98 @@ test('when post blogs then success', async () => {
 
     const response = await api
         .post('/api/blogs')
-        .send(newBlog)
+        .send(request)
         .expect(201)
+        .expect('Content-Type', /application\/json/)
 
-    assert.strictEqual(response.body.title, newBlog.title)
-    assert.strictEqual(response.body.author, newBlog.author)
-    assert.strictEqual(response.body.url, newBlog.url)
+    assert.strictEqual(response.body.title, request.title)
+    assert.strictEqual(response.body.author, request.author)
+    assert.strictEqual(response.body.url, request.url)
     assert.ok(response.body.id)
+    assert.ok(response.body.id !== undefined && response.body.id !== null)
 
-    const notesAtEnd = await helper.notesInDb()
-    assert.strictEqual(notesAtEnd.length, initialBlogs.length + 1)
+    const resultingBlogs = await helper.notesInDb()
+    assert.strictEqual(resultingBlogs.length, initialBlogs.length + 1)
 })
 
 test('given no title when post blogs then error', async () => {
-    const newBlog = {
+    const request = {
         author: 'Author 3',
         url: 'url',
     }
 
     await api
         .post('/api/blogs')
-        .send(newBlog)
+        .send(request)
         .expect(400)
+        .expect('Content-Type', /application\/json/)
 
-    const notesAtEnd = await helper.notesInDb()
-    assert.strictEqual(notesAtEnd.length, initialBlogs.length)
+    const resultingBlogs = await helper.notesInDb()
+    assert.strictEqual(resultingBlogs.length, initialBlogs.length)
+})
+
+test('given undefined likes when post blogs then likes defaults to 0', async () => {
+    const request = {
+        title: 'Blog with undefined likes',
+        url: 'url',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(request)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const resultingBlogs = await helper.notesInDb()
+    const result = resultingBlogs.find(blog => blog.title === request.title)
+    assert.ok(result.likes === 0)
+})
+
+test('given undefined title when post blogs then bad request', async () => {
+    const request = {
+        url: 'url',
+        author: 'Author',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(request)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+})
+
+test('given undefined url when post blogs then bad request', async () => {
+    const request = {
+        title: 'Blog with undefined url',
+        author: 'Author',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(request)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+})
+
+test('given valid id when delete blog then success', async () => {
+    const initialBlogsInDb = await helper.notesInDb()
+    const id = initialBlogsInDb[0].id
+
+    await api
+        .delete(`/api/blogs/${id}`)
+        .expect(204)
+
+    const resultingBlogs = await helper.notesInDb()
+    assert.ok(resultingBlogs.length === initialBlogsInDb.length - 1)
+    assert.ok(!resultingBlogs.find(blog => blog.id === id))
+})
+
+test('given invalid id when delete blog then not found', async () => {
+    const invalidId = await helper.nonExistingId()
+
+    await api
+        .delete(`/api/blogs/${invalidId}`)
+        .expect(404)
 })
 
 after(async () => {
