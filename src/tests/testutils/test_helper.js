@@ -69,19 +69,25 @@ const getToken = async (userDetails) => {
 }
 
 const initDatabase = async () => {
-    console.log('INIT DATABASE START')
-
+    // Clean db
     await User.deleteMany({})
-
-    const users = await initialUsers()
-    console.log('INSERTING USERS:', users)
-
-    await User.insertMany(users)
-
     await Blog.deleteMany({})
-    await Blog.insertMany(initialBlogs)
 
-    console.log('INIT DATABASE DONE')
+    // Create initial user
+    const users = await initialUsers()
+    const savedUsers = await User.insertMany(users)
+    const initialUser = savedUsers[0]
+
+    // Save blogs with user reference
+    const blogs = initialBlogs.map(blog => ({
+        ...blog,
+        user: initialUser._id
+    }))
+    const savedBlogs = await Blog.insertMany(blogs)
+
+    // Update blog and user references
+    initialUser.blogs = savedBlogs.map(blog => blog._id)
+    await initialUser.save()
 }
 
 module.exports = {

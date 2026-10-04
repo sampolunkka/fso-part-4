@@ -29,6 +29,20 @@ describe('given get blogs', () => {
 
         })
     })
+
+    test('when get blogs then user linked', async () => {
+        const response = await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        response.body.forEach((blog) => {
+            assert.ok(blog.user)
+            assert.ok(blog.user.username === userDetails.username)
+            assert.ok(blog.user.name === userDetails.name)
+            assert.ok(blog.user.id)
+        })
+    })
 })
 
 describe('given post blogs', () => {
