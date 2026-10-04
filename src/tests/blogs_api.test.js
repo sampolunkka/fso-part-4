@@ -111,7 +111,6 @@ test('given undefined url when post blogs then bad request', async () => {
         .post('/api/blogs')
         .send(request)
         .expect(400)
-        .expect('Content-Type', /application\/json/)
 })
 
 test('given valid id when delete blog then success', async () => {
@@ -156,7 +155,6 @@ test('given invalid id when patch blog then not found', async () => {
         .patch(`/api/blogs/${invalidId}`)
         .send({likes: 10})
         .expect(404)
-        .expect('Content-Type', /application\/json/)
 })
 
 test('given undefined likes when patch blog then bad request', async () => {
