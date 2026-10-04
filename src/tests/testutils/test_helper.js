@@ -55,7 +55,7 @@ const usersInDb = async () => {
 }
 
 const getToken = async (userDetails) => {
-    const user = await User.findOne({ username: userDetails.username })
+    const user = await User.findOne({username: userDetails.username})
     if (!user) {
         throw new Error('User not found')
     }
@@ -68,4 +68,12 @@ const getToken = async (userDetails) => {
     return jwt.sign(userForToken, SECRET)
 }
 
-module.exports = {initialBlogs, initialUsers, initialUserDetails, blogsInDb, nonExistingId, usersInDb}
+module.exports = {
+    initialBlogs,
+    initialUsers,
+    initialUserDetails,
+    blogsInDb,
+    nonExistingId,
+    usersInDb,
+    getToken
+}

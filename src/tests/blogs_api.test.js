@@ -8,6 +8,7 @@ const Blog = require('../models/blog')
 const helper = require('./testutils/test_helper')
 
 const initialBlogs = helper.initialBlogs
+const userDetails = helper.initialUserDetails
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -35,6 +36,8 @@ describe('given get blogs', () => {
 
 describe('given post blogs', () => {
     test('when valid request then success', async () => {
+        const token = await helper.getToken(userDetails)
+
         const request = {
             title: 'Blog 3',
             author: 'Author 3',
@@ -43,6 +46,7 @@ describe('given post blogs', () => {
 
         const response = await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(request)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -57,7 +61,23 @@ describe('given post blogs', () => {
         assert.strictEqual(resultingBlogs.length, initialBlogs.length + 1)
     })
 
+    test('when invalid token then unauthorized', async () => {
+        const request = {
+            title: 'Blog 3',
+            author: 'Author 3',
+            url: 'url',
+        }
+
+        await api
+            .post('/api/blogs')
+            .set('Authorization', 'Bearer invalidtoken')
+            .send(request)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+    })
+
     test('when no title when then bad request', async () => {
+        const token = await helper.getToken(userDetails)
         const request = {
             author: 'Author 3',
             url: 'url',
@@ -65,6 +85,7 @@ describe('given post blogs', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(request)
             .expect(400)
             .expect('Content-Type', /application\/json/)
@@ -74,6 +95,7 @@ describe('given post blogs', () => {
     })
 
     test('when undefined likes then success and likes defaults to 0', async () => {
+        const token = await helper.getToken(userDetails)
         const request = {
             title: 'Blog with undefined likes',
             url: 'url',
@@ -81,6 +103,7 @@ describe('given post blogs', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(request)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -91,6 +114,7 @@ describe('given post blogs', () => {
     })
 
     test('when undefined title then bad request', async () => {
+        const token = await helper.getToken(userDetails)
         const request = {
             url: 'url',
             author: 'Author',
@@ -98,12 +122,14 @@ describe('given post blogs', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(request)
             .expect(400)
             .expect('Content-Type', /application\/json/)
     })
 
     test('when undefined url then bad request', async () => {
+        const token = await helper.getToken(userDetails)
         const request = {
             title: 'Blog with undefined url',
             author: 'Author',
@@ -111,6 +137,7 @@ describe('given post blogs', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(request)
             .expect(400)
     })
