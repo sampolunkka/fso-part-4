@@ -4,17 +4,14 @@ const supertest = require('supertest')
 const assert = require('assert')
 const app = require('../app')
 const api = supertest(app)
-const Blog = require('../models/blog')
 const helper = require('./testutils/test_helper')
 
 const initialBlogs = helper.initialBlogs
 const userDetails = helper.initialUserDetails
 
+
 beforeEach(async () => {
-    await Blog.deleteMany({})
-    for (const blog of initialBlogs) {
-        await new Blog(blog).save()
-    }
+    await helper.initDatabase()
 })
 
 describe('given get blogs', () => {

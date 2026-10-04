@@ -68,6 +68,22 @@ const getToken = async (userDetails) => {
     return jwt.sign(userForToken, SECRET)
 }
 
+const initDatabase = async () => {
+    console.log('INIT DATABASE START')
+
+    await User.deleteMany({})
+
+    const users = await initialUsers()
+    console.log('INSERTING USERS:', users)
+
+    await User.insertMany(users)
+
+    await Blog.deleteMany({})
+    await Blog.insertMany(initialBlogs)
+
+    console.log('INIT DATABASE DONE')
+}
+
 module.exports = {
     initialBlogs,
     initialUsers,
@@ -75,5 +91,6 @@ module.exports = {
     blogsInDb,
     nonExistingId,
     usersInDb,
-    getToken
+    getToken,
+    initDatabase,
 }

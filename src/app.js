@@ -5,7 +5,12 @@ const logger = require('./utils/logger')
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
-const {errorHandler, unknownEndpoint, requestLogger} = require('./utils/middleware')
+const {
+    errorHandler,
+    unknownEndpoint,
+    requestLogger,
+    tokenExtractor
+} = require('./utils/middleware')
 
 const app = express()
 
@@ -21,13 +26,9 @@ mongoose.connect(config.MONGODB_URI)
 
 app.use(express.json())
 app.use(requestLogger)
+app.use(tokenExtractor)
 
-/*
-  ╭────────╮
-  │ Routes ├───┬── Blogs API
-  ╰────────╯   ├── Users API
-               ╰── Login API
-* */
+// Routes
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)

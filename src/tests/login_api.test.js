@@ -4,18 +4,13 @@ const supertest = require('supertest')
 const assert = require('assert')
 const app = require('../app')
 const api = supertest(app)
-const User = require('../models/user')
 const helper = require('./testutils/test_helper')
 
-describe('given login request', () => {
-    beforeEach(async () => {
-        await User.deleteMany({})
-        const initialUsers = await helper.initialUsers()
-        for (const user of initialUsers) {
-            await new User(user).save()
-        }
-    })
+beforeEach(async () => {
+    await helper.initDatabase()
+})
 
+describe('given login request', () => {
     test('when correct credentials then success', async () => {
         const request = {
             username: helper.initialUserDetails.username,

@@ -4,18 +4,13 @@ const supertest = require('supertest')
 const assert = require('assert')
 const app = require('../app')
 const api = supertest(app)
-const User = require('../models/user')
 const helper = require('./testutils/test_helper')
 
-describe('when there is initially one user at db', () => {
-    beforeEach(async () => {
-        await User.deleteMany({})
-        const initialUsers = await helper.initialUsers()
-        for (const user of initialUsers) {
-            await new User(user).save()
-        }
-    })
+beforeEach(async () => {
+    await helper.initDatabase()
+})
 
+describe('when there is initially one user at db', () => {
     test('creation succeeds with a fresh username', async () => {
         const usersAtStart = await helper.usersInDb()
 
@@ -40,6 +35,8 @@ describe('when there is initially one user at db', () => {
 
     test('creation fails with proper status code and message if username already taken', async () => {
         const usersAtStart = await helper.usersInDb()
+
+        console.log(usersAtStart)
 
         const result = await api
             .post('/api/users')

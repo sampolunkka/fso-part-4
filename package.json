@@ -4,9 +4,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=prod node src/index.js",
-    "dev": "cross-env NODE_ENV=dev node --watch src/index.js",
-    "test": "cross-env NODE_ENV=test node --test",
-    "build:ui": "cd web && npm run build",
+    "dev": "cross-env  NODE_ENV=dev node --watch src/index.js",
+    "test": "cross-env NODE_ENV=test node --test --test-concurrency=1",
     "lint": "eslint ."
   },
   "dependencies": {
