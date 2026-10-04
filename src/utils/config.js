@@ -3,6 +3,7 @@ require('dotenv').config()
 const TEST = 'test'
 
 const PORT = process.env.PORT
+const SECRET = process.env.SECRET
 
 function getEnvUri() {
     const env = process.env.NODE_ENV
@@ -16,4 +17,4 @@ function getEnvUri() {
 
 const MONGODB_URI = getEnvUri()
 
-module.exports = {MONGODB_URI, PORT}
+module.exports = {MONGODB_URI, PORT, SECRET}
