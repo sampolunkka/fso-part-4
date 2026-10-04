@@ -58,6 +58,27 @@ describe('given post blogs', () => {
         assert.strictEqual(resultingBlogs.length, initialBlogs.length + 1)
     })
 
+    test('when valid request then user linked', async () => {
+        const token = await helper.getToken(userDetails)
+
+        const request = {
+            title: 'Linked Blog',
+            author: 'Author',
+            url: 'url',
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
+            .send(request)
+            .expect(201)
+
+        const user = response.body.user
+        assert.ok(user.username === userDetails.username)
+        assert.ok(user.name === userDetails.name)
+        assert.ok(user.id !== undefined && user.id !== null)
+    })
+
     test('when invalid token then unauthorized', async () => {
         const request = {
             title: 'Blog 3',

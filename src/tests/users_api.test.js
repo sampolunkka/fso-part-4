@@ -10,8 +10,22 @@ beforeEach(async () => {
     await helper.initDatabase()
 })
 
-describe('when there is initially one user at db', () => {
-    test('creation succeeds with a fresh username', async () => {
+describe('get users', () => {
+    test('when get users then success', async () => {
+        const response = await api
+            .get('/api/users')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(response.body.length, 1)
+
+        const usernames = response.body.map(u => u.username)
+        assert(usernames.includes(helper.initialUserDetails.username))
+    })
+})
+
+describe('given post users', () => {
+    test('when unique username then success', async () => {
         const usersAtStart = await helper.usersInDb()
 
         const newUser = {
@@ -33,7 +47,7 @@ describe('when there is initially one user at db', () => {
         assert(usernames.includes(newUser.username))
     })
 
-    test('creation fails with proper status code and message if username already taken', async () => {
+    test('when duplicate username then bad request', async () => {
         const usersAtStart = await helper.usersInDb()
 
         console.log(usersAtStart)

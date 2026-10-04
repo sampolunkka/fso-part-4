@@ -14,11 +14,8 @@ blogsRouter.get('/', async (request, response, next) => {
 })
 
 blogsRouter.post('/', async (request, response, next) => {
-
-    console.log(request.body)
     try {
         const decodedToken = jwt.verify(request.token, SECRET)
-        console.log(decodedToken)
         if (!decodedToken.id) {
             return response.status(401).json({ error: 'token invalid' })
         }
@@ -29,7 +26,13 @@ blogsRouter.post('/', async (request, response, next) => {
         }
 
         const blog = new Blog(request.body)
+        blog.user = user._id
         const savedBlog = await blog.save()
+
+        user.blogs = user.blogs.concat(savedBlog._id)
+        await user.save()
+
+        await savedBlog.populate('user', { username: 1, name: 1, id: 1})
 
         response.status(201).json(savedBlog)
     } catch (error) {
