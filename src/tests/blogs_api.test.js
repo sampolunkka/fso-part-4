@@ -11,10 +11,9 @@ const initialBlogs = helper.initialBlogs
 
 beforeEach(async () => {
     await Blog.deleteMany({})
-    let BlogObject = new Blog(initialBlogs[0])
-    await BlogObject.save()
-    BlogObject = new Blog(initialBlogs[1])
-    await BlogObject.save()
+    for (const blog of initialBlogs) {
+        await new Blog(blog).save()
+    }
 })
 
 test('when get blogs then success', async () => {
@@ -51,7 +50,7 @@ test('when post blogs then success', async () => {
     assert.ok(response.body.id)
     assert.ok(response.body.id !== undefined && response.body.id !== null)
 
-    const resultingBlogs = await helper.notesInDb()
+    const resultingBlogs = await helper.blogsInDb()
     assert.strictEqual(resultingBlogs.length, initialBlogs.length + 1)
 })
 
@@ -67,7 +66,7 @@ test('given no title when post blogs then error', async () => {
         .expect(400)
         .expect('Content-Type', /application\/json/)
 
-    const resultingBlogs = await helper.notesInDb()
+    const resultingBlogs = await helper.blogsInDb()
     assert.strictEqual(resultingBlogs.length, initialBlogs.length)
 })
 
@@ -83,7 +82,7 @@ test('given undefined likes when post blogs then likes defaults to 0', async () 
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
-    const resultingBlogs = await helper.notesInDb()
+    const resultingBlogs = await helper.blogsInDb()
     const result = resultingBlogs.find(blog => blog.title === request.title)
     assert.ok(result.likes === 0)
 })
@@ -114,14 +113,14 @@ test('given undefined url when post blogs then bad request', async () => {
 })
 
 test('given valid id when delete blog then success', async () => {
-    const blogs = await helper.notesInDb()
+    const blogs = await helper.blogsInDb()
     const id = blogs[0].id
 
     await api
         .delete(`/api/blogs/${id}`)
         .expect(204)
 
-    const resultingBlogs = await helper.notesInDb()
+    const resultingBlogs = await helper.blogsInDb()
     assert.ok(resultingBlogs.length === blogs.length - 1)
     assert.ok(!resultingBlogs.find(blog => blog.id === id))
 })
@@ -135,7 +134,7 @@ test('given invalid id when delete blog then not found', async () => {
 })
 
 test('given valid id when patch blog then success', async () => {
-    const blogs = await helper.notesInDb()
+    const blogs = await helper.blogsInDb()
     const id = blogs[0].id
     const likes = blogs[0].likes + 1
 
@@ -158,7 +157,7 @@ test('given invalid id when patch blog then not found', async () => {
 })
 
 test('given undefined likes when patch blog then bad request', async () => {
-    const blogs = await helper.notesInDb()
+    const blogs = await helper.blogsInDb()
     const id = blogs[0].id
 
     await api
