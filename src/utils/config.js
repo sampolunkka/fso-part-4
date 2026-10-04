@@ -1,12 +1,22 @@
 require('dotenv').config()
 
+const PROD = 'prod'
 const TEST = 'test'
-const DEV = 'dev'
-// const PROD = 'prod'
 
 const PORT = process.env.PORT
-const MONGODB_URI = (process.env.NODE_ENV === TEST || process.env.NODE_ENV === DEV)
-    ? process.env.TEST_MONGODB_URI
-    : process.env.MONGODB_URI
+
+function getEnvUri() {
+    const env = process.env.NODE_ENV
+    switch (env) {
+        case TEST:
+            return process.env.TEST_MONGODB_URI
+        case PROD:
+            return process.env.MONGODB_URI
+        default:
+            throw new Error(`Unknown environment: ${env}`)
+    }
+}
+
+const MONGODB_URI = getEnvUri()
 
 module.exports = {MONGODB_URI, PORT}

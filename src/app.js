@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
 const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
 const {errorHandler, unknownEndpoint, requestLogger} = require('./utils/middleware')
 
 const app = express()
@@ -17,10 +18,18 @@ mongoose.connect(config.MONGODB_URI)
         logger.error('error connecting to MongoDB:', error.message)
     })
 
-//app.use(express.static('web/dist'))
 app.use(express.json())
 app.use(requestLogger)
+
+/*
+  ╭────────╮
+  │ Routes ├───┬── Blogs API
+  ╰────────╯   ├── Users API
+               ╰── Login API
+* */
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
+
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
