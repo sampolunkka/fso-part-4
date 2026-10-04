@@ -177,11 +177,13 @@ describe('given post blogs', () => {
 
 describe('given delete blogs', () => {
     test('when valid id then success', async () => {
+        const token = await helper.getToken(userDetails)
         const blogs = await helper.blogsInDb()
         const id = blogs[0].id
 
         await api
             .delete(`/api/blogs/${id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(204)
 
         const resultingBlogs = await helper.blogsInDb()
@@ -189,12 +191,39 @@ describe('given delete blogs', () => {
         assert.ok(!resultingBlogs.find(blog => blog.id === id))
     })
 
-    test('when invalid id then not found', async () => {
+    test('when invalid blog id then not found', async () => {
+        const token = await helper.getToken(userDetails)
         const invalidId = await helper.nonExistingId()
 
         await api
             .delete(`/api/blogs/${invalidId}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(404)
+    })
+
+    test('when user not authorized to delete then unauthorized', async () => {
+        const userDetails = {
+            name: 'unauthorized',
+            username: 'unauthorized',
+            password: 'unauthorized'
+        }
+
+        await helper.addUser(userDetails)
+        const token = await helper.getToken(userDetails)
+        const blogs = await helper.blogsInDb()
+        const id = blogs[0].id
+
+        await api
+            .delete(`/api/blogs/${id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(403)
+            .expect('Content-Type', /application\/json/)
+    })
+
+    test('when invalid token then unauthorized', async () => {
+        await api
+            .delete('/api/blogs/ignored')
+            .expect(401)
     })
 })
 

@@ -90,6 +90,10 @@ const initDatabase = async () => {
     await initialUser.save()
 }
 
+const addUser = async (user) => {
+    await User.insertOne(user)
+}
+
 module.exports = {
     initialBlogs,
     initialUsers,
@@ -99,4 +103,5 @@ module.exports = {
     usersInDb,
     getToken,
     initDatabase,
+    addUser,
 }

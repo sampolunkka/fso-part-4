@@ -9,7 +9,6 @@ const {
     errorHandler,
     unknownEndpoint,
     requestLogger,
-    tokenExtractor
 } = require('./utils/middleware')
 
 const app = express()
@@ -26,7 +25,6 @@ mongoose.connect(config.MONGODB_URI)
 
 app.use(express.json())
 app.use(requestLogger)
-app.use(tokenExtractor)
 
 // Routes
 app.use('/api/blogs', blogsRouter)

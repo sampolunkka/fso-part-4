@@ -63,6 +63,30 @@ describe('given post users', () => {
 
         assert.strictEqual(usersAtEnd.length, usersAtStart.length)
     })
+
+    test('when too short username then bad request', async () => {
+        await api
+            .post('/api/users')
+            .send({
+                username: 'AA',
+                name: 'name',
+                password: 'password',
+            })
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+    })
+
+    test('when password too short then bad request', async() => {
+        await api
+            .post('/api/users')
+            .send({
+                username: 'AA',
+                name: 'name',
+                password: 'password',
+            })
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+    })
 })
 
 after(async () => {
