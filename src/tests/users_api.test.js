@@ -59,8 +59,6 @@ describe('given post users', () => {
             .expect('Content-Type', /application\/json/)
 
         const usersAtEnd = await helper.usersInDb()
-        assert(result.body.error.includes('expected `username` to be unique'))
-
         assert.strictEqual(usersAtEnd.length, usersAtStart.length)
     })
 

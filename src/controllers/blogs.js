@@ -39,7 +39,7 @@ blogsRouter.delete('/:id', tokenExtractor, userExtractor, async (request, respon
 
     const user = request.user
     if (blog.user.toString() !== user._id.toString()) {
-        return response.status(403).json({error: 'Insufficient credentials'})
+        return response.status(403).json({error: 'Insufficient permissions'})
     }
 
     try {
@@ -52,7 +52,7 @@ blogsRouter.delete('/:id', tokenExtractor, userExtractor, async (request, respon
 
 blogsRouter.patch('/:id', async (request, response, next) => {
     if (!request.body.likes) {
-        return response.status(400).json({error: 'Likes field is required'})
+        return response.status(400).json({error: 'likes field is required'})
     }
 
     try {
