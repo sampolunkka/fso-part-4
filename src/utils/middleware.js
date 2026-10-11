@@ -55,6 +55,7 @@ const userExtractor = async (request, response, next) => {
         }
 
         request.user = user
+        next()
     } catch (error) {
         next(error)
     }
