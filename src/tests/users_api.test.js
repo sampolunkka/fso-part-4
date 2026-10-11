@@ -52,7 +52,7 @@ describe('given post users', () => {
 
         console.log(usersAtStart)
 
-        const result = await api
+        await api
             .post('/api/users')
             .send(helper.initialUserDetails)
             .expect(400)

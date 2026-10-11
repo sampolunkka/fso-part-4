@@ -6,7 +6,8 @@
     "start": "cross-env NODE_ENV=prod node src/index.js",
     "dev": "cross-env  NODE_ENV=dev node --watch src/index.js",
     "test": "cross-env NODE_ENV=test node --test --test-concurrency=1",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
